@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <form action="../new_message/" method="post">
+        {% csrf_token %}
+        <div>
+            Send to:
+             <select multiple="multiple"  name="receivers">
+                {% for receiver in receivers %}
+                    <option value="{{receiver}}">{{receiver}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            Your message:
+           <textarea name="message" value="{{ message }}" ></textarea><br />
+        </div>
+
+        <p><input type="submit" value="Send message" /></p>
+    </form>
+    <a href="../list_message">All messages</a>
+</body>
+</html>

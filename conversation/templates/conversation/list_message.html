@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    {% for message in messages %}
+        <div>
+            Sender:
+            {{message.sender}}<br />
+            Content:
+            {{message.content}}<br />
+            Receivers:
+                {% for receiver in message.receiver.all %}
+                    {{receiver}}
+                {% endfor %}<br />
+            <a href="../view_message/{{message.id}}">View Message Detail</a><br />
+        </div>
+    {% endfor %}<br />
+    <a href="../home">Home</a>
+</body>
+</html>

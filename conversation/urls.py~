@@ -1,0 +1,10 @@
+from django.conf.urls import patterns, url
+from django.views import generic
+from conversation import views
+
+urlpatterns = patterns('',
+    url(r'^$', 'conversation.views.index', name='index'),
+    url(r'^login/$', 'conversation.views.login_user', name ='login'),
+    url(r'^logout/', 'conversation.views.logout', name='logout')
+)
+

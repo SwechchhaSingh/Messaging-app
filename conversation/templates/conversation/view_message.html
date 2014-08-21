@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>View Message</title>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+</head>
+<body>
+	<div>
+        Sender: {{ sender }}<br />
+        Receivers:
+           {% for receiver in receivers %}
+              {{receiver}}
+           {% endfor %}<br />
+        Message: {{ content }}<br />
+    </div>
+    <a href="../../list_message">All messages</a>
+</body>
+</html>
