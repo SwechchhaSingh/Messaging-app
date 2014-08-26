@@ -67,25 +67,25 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 class MessageManager(models.Manager):
 
     def save(self, sender, content, receiver_list):
-        thread = self.new_thread()
-        message = self.model(sender=sender, content=content)
-        message.thread = thread
+        thread = self.new_thread()  # Generate a new thread
+        message = self.model(sender=sender, content=content)  # Create a new message
+        message.thread = thread  # Associate currently created message to currently generated thread
         message.save(using=self._db)
         for receiver in receiver_list:
             user = get_user_model().objects.get(email=receiver)
-            thread.participants.add(user)
+            thread.participants.add(user)  # Add each recipient user in thread participants
         thread.participants.add(sender)
         return message
 
     def new_thread(self):
         thread = Thread()
-        thread.save(using=self._db)
+        thread.save(using=self._db)  # New thread generation
         return thread
 
     def reply(self, sender, content, thread_id):
-        message = self.model(sender=sender, content=content)
-        thread = get_object_or_404(Thread, id=thread_id)
-        message.thread = thread
+        thread = get_object_or_404(Thread, id=thread_id)  # Find thread to be replied to
+        message = self.model(sender=sender, content=content)  # Create a new message as reply to current thread
+        message.thread = thread  # Associate new reply message to current thread
         message.save(using=self._db)
         return message
 
@@ -107,7 +107,6 @@ class Thread(models.Model):
 class Message(models.Model):
     sender = models.ForeignKey(MyUser, related_name='sent_messages')
     content = models.TextField()
-    # receiver = models.ManyToManyField(MyUser, related_name='received_messages')
     timestamp = models.DateTimeField(auto_now_add=True)
     thread = models.ForeignKey(Thread, related_name='included_messages')
 

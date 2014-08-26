@@ -1,5 +1,23 @@
 from django.contrib import admin
-from conversation.models import MyUser, Message
+from models import MyUser, Thread, Message
+
+class MessageInline(admin.TabularInline):
+    model = Message
+    extra = 1
+
+class ThreadAdmin(admin.ModelAdmin):
+    list_display = ('id', 'created_at')
+    list_filter = ['created_at']
+    search_fields = ['participants']
+    fieldsets = [
+        ('Participants',            {'fields': ['participants']}),
+        # ('Thread creation details', {'fields': ['created_at'], 'classes': ['collapse']}),
+    ]
+    inlines = [MessageInline]
+
+    # def get_participants(self, id):
+    #     return "\n".join([p.participants for p in Thread.objects.get(id=id).participants.all()])
+
 
 admin.site.register(MyUser)
-admin.site.register(Message)
+admin.site.register(Thread, ThreadAdmin)

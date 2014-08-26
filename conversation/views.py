@@ -4,12 +4,13 @@ from django.contrib.auth import authenticate, login, logout, get_user_model, get
 from django.views.decorators.csrf import csrf_protect
 from django.template import RequestContext
 from django.shortcuts import redirect, get_object_or_404
-from conversation.models import Message, Thread
+from models import Message, Thread
 from django.db.models import Q
 
 
 def home(request):
     if request.user.is_authenticated():
+        # If user is not authenticated, he can not access home page
         return render(request, 'conversation/home.html')
     return redirect(index)
 
@@ -25,7 +26,7 @@ def login_user(request):
         password = request.POST.get('password')
 
         user = authenticate(email=email, password=password)
-
+        # User authentication using email and password
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -58,6 +59,7 @@ def signup(request):
         if password and password_check and password != password_check:
             state = "Passwords don't match"
         else:
+            # Create a new user with provided email and password and redirect to login page on successful registration
             model = get_user_model()
             user = model.objects.create_user(email=email, password=password)
             state = "You're successfully registered!"
@@ -69,12 +71,15 @@ def signup(request):
 def index(request):
     if request.user.is_authenticated():
         return redirect(home)
+    # If user already signed in, redirect to home page
     return render_to_response('conversation/index.html')
 
 
 def new_message(request):
     if request.user.is_anonymous():
         return redirect(index)
+    # New thread creation for new message
+    # Requires participants for thread and initial message
     model = get_user_model()
     receivers = model.objects.exclude(email=request.user)
     sender = get_user(request)
@@ -93,6 +98,8 @@ def view_message(request, message_id):
     if request.user.is_anonymous():
         return redirect(index)
     message = get_object_or_404(Message, id=message_id)
+    # Find existing message in database through provided message-id
+    # Raise 404 error in case message object is not found
     sender = message.sender
     content = message.content
     thread = message.thread
@@ -114,6 +121,7 @@ def list_thread(request):
         return redirect(index)
     user = request.user
     threads = Thread.objects.filter(Q(participants=user))
+    # Find all threads user is a participant of and display most recent message of each such thread
     messages = Message.objects.none()
     for thread in threads:
         thread_message = (thread.included_messages.order_by('-timestamp').values('id')[:1])
@@ -128,6 +136,7 @@ def reply(request, thread_id):
     sender = request.user
     message = ''
     thread = get_object_or_404(Thread, id=thread_id)
+    # Reply to a thread requires thread and message content
     if request.POST:
         message = request.POST.get('message')
         new_message = Message.objects.reply(sender=sender, content=message, thread_id=thread_id)

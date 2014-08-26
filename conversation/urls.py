@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views import generic
-from conversation import views
+import views
 
 urlpatterns = patterns('',
     url(r'^$', 'conversation.views.index', name='index'),
