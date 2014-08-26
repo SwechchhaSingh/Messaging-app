@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    {% for message in messages %}
+        <div>
+            Thread id:
+            {{message.thread_id}}<br />
+            Participants:
+            {% for participant in message.thread.participants.all %}
+                {{participant}}
+            {% endfor %}<br/>
+            Last message of thread:
+            {{message.content}}<br />
+            <a href="../list_message/{{message.thread_id}}">View Thread Detail</a><br />
+        </div>
+    {% endfor %}<br />
+    <a href="../home">Home</a>
+</body>
+</html>

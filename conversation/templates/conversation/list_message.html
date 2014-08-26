@@ -5,19 +5,22 @@
     <title></title>
 </head>
 <body>
+    <div>
+        Participants:
+        {% for participant in participants %}
+            {{participant}}
+        {% endfor %}
+    </div>
     {% for message in messages %}
         <div>
             Sender:
             {{message.sender}}<br />
             Content:
             {{message.content}}<br />
-            Receivers:
-                {% for receiver in message.receiver.all %}
-                    {{receiver}}
-                {% endfor %}<br />
-            <a href="../view_message/{{message.id}}">View Message Detail</a><br />
+            <a href="../list_message/view_message/{{message.id}}">View Message Detail</a><br />
         </div>
     {% endfor %}<br />
+    <a href="../reply/{{thread.id}}">Reply to thread</a>
     <a href="../home">Home</a>
 </body>
 </html>

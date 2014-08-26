@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 
 class MyUserManager(BaseUserManager):
@@ -58,7 +59,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_staff(self):
-        "Is the user a member of staff?"
+        # "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_superuser
 
@@ -66,28 +67,51 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 class MessageManager(models.Manager):
 
     def save(self, sender, content, receiver_list):
+        thread = self.new_thread()
         message = self.model(sender=sender, content=content)
-        # message.receiver = receiver
-        message.save(using = self._db)
-        model=get_user_model()
+        message.thread = thread
+        message.save(using=self._db)
         for receiver in receiver_list:
-            user=model.objects.get(email=receiver)
-            message.receiver.add(user)
+            user = get_user_model().objects.get(email=receiver)
+            thread.participants.add(user)
+        thread.participants.add(sender)
+        return message
+
+    def new_thread(self):
+        thread = Thread()
+        thread.save(using=self._db)
+        return thread
+
+    def reply(self, sender, content, thread_id):
+        message = self.model(sender=sender, content=content)
+        thread = get_object_or_404(Thread, id=thread_id)
+        message.thread = thread
+        message.save(using=self._db)
         return message
 
 
-mgr=MessageManager()
+mgr = MessageManager()
 mgr.use_for_related_fields = True
+
+
+class Thread(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    participants = models.ManyToManyField(MyUser, related_name='threads')
+
+    objects = MessageManager()
+
+    # def __unicode__(self):
+    #     return str(self.id)
 
 
 class Message(models.Model):
     sender = models.ForeignKey(MyUser, related_name='sent_messages')
     content = models.TextField()
-    receiver = models.ManyToManyField(MyUser, related_name='received_messages')
+    # receiver = models.ManyToManyField(MyUser, related_name='received_messages')
     timestamp = models.DateTimeField(auto_now_add=True)
+    thread = models.ForeignKey(Thread, related_name='included_messages')
 
     objects = MessageManager()
 
     def __unicode__(self):
         return u'%s' % self.content
-

@@ -7,12 +7,8 @@
 <body>
 	<div>
         Sender: {{ sender }}<br />
-        Receivers:
-           {% for receiver in receivers %}
-              {{receiver}}
-           {% endfor %}<br />
         Message: {{ content }}<br />
     </div>
-    <a href="../../list_message">All messages</a>
+    <a href="../../{{thread.id}}">All messages</a>
 </body>
 </html>
