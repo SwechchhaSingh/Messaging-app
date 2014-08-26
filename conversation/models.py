@@ -100,6 +100,9 @@ class Thread(models.Model):
 
     objects = MessageManager()
 
+    def get_participants(self):
+        return ",\n".join([s.email for s in self.participants.all()])
+
     # def __unicode__(self):
     #     return str(self.id)
 
