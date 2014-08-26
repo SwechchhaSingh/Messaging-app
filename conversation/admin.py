@@ -18,10 +18,6 @@ class ThreadAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', )
     inlines = [MessageInline]
 
-    # def get_participants(self, obj):
-    #     return "\n".join([p.participants for p in obj.participants.all()])
-    # # Thread.objects.get(id=id).participants.all()])
-
 
 admin.site.register(MyUser)
 admin.site.register(Thread, ThreadAdmin)

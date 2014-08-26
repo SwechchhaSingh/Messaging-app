@@ -36,8 +36,7 @@ def login_user(request):
                 state = "Your account is not active, please contact the site admin."
         else:
             state = "Your email and/or password were incorrect."
-    return render_to_response('conversation/login_form.html', {'state': state, 'email': email},
-                              context_instance = RequestContext(request))
+    return render_to_response('conversation/login_form.html',{'state':state, 'email': email}, context_instance = RequestContext(request))
 
 
 def logout_user(request):

@@ -112,7 +112,7 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     thread = models.ForeignKey(Thread, related_name='included_messages')
-
+    
     objects = MessageManager()
 
     def __unicode__(self):
