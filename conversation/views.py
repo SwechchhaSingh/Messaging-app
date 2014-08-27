@@ -121,6 +121,7 @@ def list_thread(request):
         thread_message = (thread.included_messages.order_by('-timestamp').values('id')[:1])
         message = Message.objects.filter(id=thread_message)
         messages = messages | message
+        messages = messages.order_by('-timestamp')
     return render(request, 'conversation/list_thread.html', {'messages': messages})
 
 
