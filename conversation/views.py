@@ -6,14 +6,13 @@ from django.template import RequestContext
 from django.shortcuts import redirect, get_object_or_404
 from models import Message, Thread
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def home(request):
-    if request.user.is_authenticated():
-        # If user is not authenticated, he can not access home page
-        return render(request, 'conversation/home.html')
-    return redirect(index)
-
+    # If user is not authenticated, he can not access home page
+    return render(request, 'conversation/home.html')
 
 @csrf_protect
 def login_user(request):
@@ -74,9 +73,8 @@ def index(request):
     return render_to_response('conversation/index.html')
 
 
+@login_required
 def new_message(request):
-    if request.user.is_anonymous():
-        return redirect(index)
     # New thread creation for new message
     # Requires participants for thread and initial message
     model = get_user_model()
@@ -93,9 +91,8 @@ def new_message(request):
                               context_instance=RequestContext(request))
 
 
+@login_required
 def view_message(request, message_id):
-    if request.user.is_anonymous():
-        return redirect(index)
     message = get_object_or_404(Message, id=message_id)
     # Find existing message in database through provided message-id
     # Raise 404 error in case message object is not found
@@ -105,9 +102,8 @@ def view_message(request, message_id):
     return render(request, 'conversation/view_message.html', {'sender': sender, 'content': content, 'thread': thread})
 
 
+@login_required
 def list_message(request, thread_id):
-    if request.user.is_anonymous():
-        return redirect(index)
     thread = get_object_or_404(Thread, id=thread_id)
     messages = Message.objects.filter(Q(thread=thread)).order_by('-timestamp').distinct()
     participants = thread.participants.all()
@@ -115,9 +111,8 @@ def list_message(request, thread_id):
                                                               'participants': participants})
 
 
+@login_required
 def list_thread(request):
-    if request.user.is_anonymous():
-        return redirect(index)
     user = request.user
     threads = Thread.objects.filter(Q(participants=user))
     # Find all threads user is a participant of and display most recent message of each such thread
@@ -129,9 +124,8 @@ def list_thread(request):
     return render(request, 'conversation/list_thread.html', {'messages': messages})
 
 
+@login_required
 def reply(request, thread_id):
-    if request.user.is_anonymous():
-        return redirect(index)
     sender = request.user
     message = ''
     thread = get_object_or_404(Thread, id=thread_id)
