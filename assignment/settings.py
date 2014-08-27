@@ -100,3 +100,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGIN_URL = '/conversation/'
+
+LOGIN_REDIRECT_URL = '/conversation/home/'
