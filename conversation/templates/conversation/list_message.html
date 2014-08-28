@@ -11,16 +11,20 @@
             {{participant}}
         {% endfor %}
     </div>
-    {% for message in messages %}
-        <div>
-            Sender:
-            {{message.sender}}<br />
-            Content:
-            {{message.content}}<br />
-            <a href="../list_message/view_message/{{message.id}}">View Message Detail</a><br />
-        </div>
-    {% endfor %}<br />
-    <a href="../reply/{{thread.id}}">Reply to thread</a>
-    <a href="../home">Home</a>
+    <table>
+        <tr>
+            <td>Sender:</td>
+            <td>Content:</td>
+            <td>Message details link:</td>
+        </tr>
+    {% for message in messages_list %}
+        <div><tr>
+            <td>{{message.sender}}</td>
+            <td>{{message.content}}</td>
+            <td><a href="{% url 'view_message' message.id %}">Detail</a></td>
+        </tr></div>
+    {% endfor %}</table>
+    <a href="{% url 'reply' thread.id %}">Reply to thread</a>
+    <a href="{% url 'list_thread' %}">All threads</a>
 </body>
 </html>

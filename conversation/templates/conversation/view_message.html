@@ -6,9 +6,10 @@
 </head>
 <body>
 	<div>
-        Sender: {{ sender }}<br />    
-        Message: {{ content }}<br />
+        Sender: {{ object.sender }}<br />
+        Message: {{ object.content }}<br />
     </div>
-    <a href="../../{{thread.id}}">All messages</a>
+    <a href="{% url 'list_message' object.thread.id %}">All messages</a>
+    <a href="{% url 'list_thread' %}">All threads</a>
 </body>
 </html>

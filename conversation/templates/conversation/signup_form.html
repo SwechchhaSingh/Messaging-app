@@ -5,21 +5,16 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
-	{{ state }}
-	<form action="../signup/" method="post">
+	<form action="{% url 'signup' %}" method="post">
         {% csrf_token %}
 
 		{% if next %}
 		<input type="hidden" name="next" value="{{ next }}" />
 		{% endif %}
-		email:
-		<input type="email" name="email" value="" /><br />
-		password:
-		<input type="password" name="password1" value="" /><br />
-        confirm password:
-        <input type="password" name="password2" value="" /><br />
 
-		<input type="submit" value="Sign Up" />
+        {{form}}
+		<input type="submit" value="Sign Up" /><br />
 	</form>
+    <a href="{% url 'login' %}">Login</a><br />
 </body>
 </html>

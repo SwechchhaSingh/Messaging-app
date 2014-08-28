@@ -102,3 +102,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = '/conversation/'
+
+LOGIN_REDIRECT_URL = '/conversation/list_thread/'
