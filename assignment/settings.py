@@ -103,4 +103,4 @@ STATIC_URL = '/static/'
 
 LOGIN_URL = '/conversation/'
 
-LOGIN_REDIRECT_URL = '/conversation/home/'
+LOGIN_REDIRECT_URL = '/conversation/list_thread/'

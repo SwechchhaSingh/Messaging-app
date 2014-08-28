@@ -5,15 +5,14 @@
     <title></title>
 </head>
 <body>
-    <form action="../reply/{{thread.id}}" method="post">
+    <form action="{% url 'reply' thread.id %}" method="post">
         {% csrf_token %}
-        <div>
-            Reply message:
-            <textarea name="message" value="{{ message }}" ></textarea><br />
-        </div>
+        Message:
+        {{ form.content }}
+        {{ form.content.errors }}
 
         <p><input type="submit" value="Send message" /></p>
     </form>
-    <a href="../list_message/{{thread.id}}">Back to main thread</a>
+    <a href="{% url 'list_message' thread.id %}">Back to main thread</a><br />
 </body>
 </html>

@@ -5,19 +5,27 @@
     <title></title>
 </head>
 <body>
-    {% for message in messages %}
-        <div>
-            Thread id:
-            {{message.thread_id}}<br />
-            Participants:
+    <table>
+        <tr>
+            <td>Thread id:</td>
+            <td>Participants:</td>
+            <td>Last message of thread:</td>
+            <td>Thread link</td>
+        </tr>
+        {% for message in messages_list %}
+        <div><tr>
+            <td>{{ message.thread_id }}</td>
+            <td>
             {% for participant in message.thread.participants.all %}
-                {{participant}}
-            {% endfor %}<br/>
-            Last message of thread:
-            {{message.content}}<br />
-            <a href="../list_message/{{message.thread_id}}">View Thread Detail</a><br />
+                {{ participant }}
+            {% endfor %}</td>
+            <td>{{ message.content }}</td>
+            <td><a href="{% url 'list_message' message.thread_id %}">Detail</a></td>
+        </tr>
         </div>
     {% endfor %}<br />
-    <a href="../home">Home</a>
+     </table>
+    <a href="{% url 'new_message' %}">New Thread</a><br />
+    <a href="{% url 'logout' %}">Logout</a><br />
 </body>
 </html>

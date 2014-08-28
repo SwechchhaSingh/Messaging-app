@@ -5,12 +5,12 @@
     <title></title>
 </head>
 <body>
-    <form action="../new_message/" method="post">
+    <form action="{% url 'new_message' %}" method="post">
         {% csrf_token %}
         <div>
             Send to:
              <select multiple="multiple"  name="receivers">
-                {% for receiver in receivers %}
+                {% for receiver in form.receivers %}
                     <option value="{{receiver}}">{{receiver}}</option>
                 {% endfor %}
             </select>
@@ -20,8 +20,8 @@
            <textarea name="message" value="{{ message }}" ></textarea><br />
         </div>
 
-        <p><input type="submit" value="Send message" /></p>
+        <p><input type="submit" value="Send message" /></p><br />
     </form>
-    <a href="../list_thread">All threads</a>
+    <a href="{% url 'list_thread' %}">All threads</a><br />
 </body>
 </html>

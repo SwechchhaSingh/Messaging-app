@@ -66,8 +66,11 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
 class MessageManager(models.Manager):
 
-    def save(self, sender, content, receiver_list):
-        thread = self.new_thread()  # Generate a new thread
+    def save(self, sender, content, receiver_list, thread_id=None):
+        if thread_id:
+            thread = Thread.objects.get(id=thread_id)  # Generate a new thread
+        else:
+            thread = self.new_thread()
         message = self.model(sender=sender, content=content)  # Create a new message
         message.thread = thread  # Associate currently created message to currently generated thread
         message.save(using=self._db)
@@ -81,13 +84,6 @@ class MessageManager(models.Manager):
         thread = Thread()
         thread.save(using=self._db)  # New thread generation
         return thread
-
-    def reply(self, sender, content, thread_id):
-        thread = get_object_or_404(Thread, id=thread_id)  # Find thread to be replied to
-        message = self.model(sender=sender, content=content)  # Create a new message as reply to current thread
-        message.thread = thread  # Associate new reply message to current thread
-        message.save(using=self._db)
-        return message
 
 
 mgr = MessageManager()
