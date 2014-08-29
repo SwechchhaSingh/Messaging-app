@@ -1,8 +1,8 @@
 from django import forms
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from models import *
-from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
+from django.contrib.auth import authenticate, login
+from django.db.models import Q
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -48,54 +48,35 @@ class CustomAuthenticationForm(AuthenticationForm):
         return self.cleaned_data
 
 
-class NewMessageForm(forms.Form):
-
-    message = forms.CharField(widget=forms.Textarea)
-    receivers = forms.MultipleChoiceField(required=True, widget=forms.SelectMultiple,
-                                          choices=MyUser.objects.all().values_list('id', 'email'))
-    # receivers = model.objects.exclude(email=request.user)
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(NewMessageForm, self).__init__(*args, **kwargs)
-        message = ''
-
-    def clean(self):
-        message = self.cleaned_data.get('message')
-        receivers = self.cleaned_data.get('receivers')
-        if message and receivers:
-            participants = MyUser.objects.filter(id__in=receivers)
-            sender = self.request.user
-            new_message = Message.objects.save(sender=sender, content=message, receiver_list=participants)
-        return self.cleaned_data
-
-#
-# class ReplyForm(forms.Form):
-#
-#     def __init__(self, *args, **kwargs):
-#         self.request = kwargs.pop('request', None)
-#         super(ReplyForm, self).__init__(*args, **kwargs)
-#         message = ''
-#
-#     def clean(self):
-#         message = self.cleaned_data.get('message')
-#         print "------------------------------", self.request, "----------------------------------------"
-#         if message:
-#             sender = self.request.user
-#             print sender, "__________________________________________________________________________"
-#             new_message = Message.objects.reply(sender=sender, content=message, thread_id=thread_id)
-#         return self.cleaned_data
-
-
 class ReplyForm(forms.ModelForm):
 
     class Meta:
         model = Message
         fields = ['content']
 
-#
-# class NewMessageForm(forms.ModelForm):
-#
-#     class Meta:
-#         model = Message
-#         fields = ['content']
+
+class NewMessageForm(forms.ModelForm):
+
+    participants = forms.MultipleChoiceField(required=True, widget=forms.SelectMultiple,
+                                             choices=MyUser.objects.all().values_list('id', 'email'))
+
+    class Meta:
+        model = Message
+        fields = ['content']
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(NewMessageForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        message = super(NewMessageForm, self).save(commit=False)
+        message.sender = self.request.user
+        receivers = MyUser.objects.filter(id__in=self.cleaned_data.get('participants'))
+        participants = MyUser.objects.filter(Q(email=message.sender) | Q(id__in=receivers))
+        thread = Thread.objects.create()
+        thread.participants = participants
+        thread.save()
+        message.thread = thread
+        if commit:
+            message.save()
+        return message

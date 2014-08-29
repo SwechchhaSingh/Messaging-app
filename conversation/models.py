@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.auth import get_user_model
@@ -66,18 +67,22 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
 class MessageManager(models.Manager):
 
-    def save(self, sender, content, receiver_list, thread_id=None):
+    def save(self, sender, content, receiver_list=None, thread_id=None):
         if thread_id:
             thread = Thread.objects.get(id=thread_id)  # Generate a new thread
         else:
-            thread = self.new_thread()
+            if receiver_list:
+                thread = self.new_thread()
+                for receiver in receiver_list:
+                    user = get_user_model().objects.get(email=receiver)
+                    thread.participants.add(user)  # Add each recipient user in thread participants
+                thread.participants.add(sender)
+            else:
+                raise ValidationError([
+                    ValidationError('Both thread_id and receivers_list cannot be None', code='CustomError'), ])
         message = self.model(sender=sender, content=content)  # Create a new message
         message.thread = thread  # Associate currently created message to currently generated thread
         message.save(using=self._db)
-        for receiver in receiver_list:
-            user = get_user_model().objects.get(email=receiver)
-            thread.participants.add(user)  # Add each recipient user in thread participants
-        thread.participants.add(sender)
         return message
 
     def new_thread(self):

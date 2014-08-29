@@ -9,18 +9,14 @@
         {% csrf_token %}
         <div>
             Send to:
-             <select multiple="multiple"  name="receivers">
-                {% for receiver in form.receivers %}
-                    <option value="{{receiver}}">{{receiver}}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div>
-            Your message:
-           <textarea name="message" value="{{ message }}" ></textarea><br />
-        </div>
+            {{ form.participants }}
+            {{ form.participants.errors }}<br />
+            Message:
+            {{ form.content }}
+            {{ form.content.errors }}<br />
 
         <p><input type="submit" value="Send message" /></p><br />
+        </div>
     </form>
     <a href="{% url 'list_thread' %}">All threads</a><br />
 </body>
