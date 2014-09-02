@@ -57,8 +57,7 @@ class ReplyForm(forms.ModelForm):
 
 class NewMessageForm(forms.ModelForm):
 
-    participants = forms.MultipleChoiceField(required=True, widget=forms.SelectMultiple,
-                                             choices=MyUser.objects.all().values_list('id', 'email'))
+    # participants = forms.MultipleChoiceField()
 
     class Meta:
         model = Message
@@ -67,14 +66,18 @@ class NewMessageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super(NewMessageForm, self).__init__(*args, **kwargs)
+        self.fields['participants'] = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=MyUser.objects.all()
+                                                                .exclude(email=self.request.user)
+                                                                .values_list('id', 'email'))
 
     def save(self, commit=True):
         message = super(NewMessageForm, self).save(commit=False)
         message.sender = self.request.user
-        receivers = MyUser.objects.filter(id__in=self.cleaned_data.get('participants'))
-        participants = MyUser.objects.filter(Q(email=message.sender) | Q(id__in=receivers))
+        # participants include all receivers and the message sender
+        participants = MyUser.objects.filter(Q(id__in=self.cleaned_data.get('participants')) | Q(email=message.sender))
         thread = Thread.objects.create()
         thread.participants = participants
+        # participants are to be saved in thread object
         thread.save()
         message.thread = thread
         if commit:

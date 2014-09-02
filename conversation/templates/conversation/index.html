@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Conversation</title>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-</head>
-<body>
+{% extends "conversation/base.html" %}
+
+{% block title %} Conversation {% endblock %}
+
+{% block body %}
     New User?
     <a href="{% url 'signup' %}">Sign Up</a><br />
     Have an account?
     <a href="{% url 'login' %}">Login</a><br />
-</body>
-</html>
+{% endblock %}

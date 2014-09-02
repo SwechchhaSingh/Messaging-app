@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>View Message</title>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-</head>
-<body>
+{% extends "conversation/base.html" %}
+
+{% block title %} View Message {% endblock %}
+
+{% block body %}
 	<div>
         Sender: {{ object.sender }}<br />
         Message: {{ object.content }}<br />
     </div>
     <a href="{% url 'list_message' object.thread.id %}">All messages</a>
     <a href="{% url 'list_thread' %}">All threads</a>
-</body>
-</html>
+{% endblock %}

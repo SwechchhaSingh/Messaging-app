@@ -36,6 +36,10 @@ class SignupView(FormView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('list_thread')
 
+    def form_valid(self, form):
+        user = form.save()
+        return super(SignupView, self).form_valid(form)
+
 
 class IndexView(TemplateView):
     template_name = 'conversation/index.html'
@@ -45,11 +49,6 @@ class MessageDetailView(DetailView):
     # To view details of individual message
     model = Message
     template_name = 'conversation/view_message.html'
-
-    # Context data to be accessible to template
-    def get_context_data(self, **kwargs):
-        context = super(MessageDetailView, self).get_context_data(**kwargs)
-        return context
 
 
 class ListMessageView(ListView):
@@ -61,20 +60,23 @@ class ListMessageView(ListView):
         context = super(ListMessageView, self).get_context_data(**kwargs)
         pk = self.kwargs['pk']
         thread = get_object_or_404(Thread, id=pk)
-        context['messages_list'] = Message.objects.filter(Q(thread=thread)).order_by('-timestamp').distinct()
-        # Messages included in the current thread only
         context['participants'] = thread.participants.all()
         context['thread'] = thread
         return context
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        thread = get_object_or_404(Thread, id=pk)
+        messages_list = Message.objects.filter(Q(thread=thread)).order_by('-timestamp').distinct()
+        # Messages included in the current thread only
+        return messages_list
 
 
 class ListThreadView(ListView):
     queryset = {}  # Including custom queries in context, so queryset is not required
     template_name = 'conversation/list_thread.html'
 
-    # Customising context data
-    def get_context_data(self, **kwargs):
-        context = super(ListThreadView, self).get_context_data(**kwargs)
+    def get_queryset(self):
         user = MyUser.objects.filter(email=self.request.user)
         threads = Thread.objects.filter(Q(participants=user))
         # Find all threads user is a participant of and display most recent message of each such thread
@@ -84,15 +86,16 @@ class ListThreadView(ListView):
             #Include one (most recent) message of each thread user is a participant of
             message = Message.objects.filter(id=thread_message)
             messages = messages | message
-        context['messages_list'] = messages.order_by('-timestamp')
-        return context
-
+        messages_list = messages.order_by('-timestamp')
+        return messages_list
 
 class ReplyView(FormView):
     # Adding reply message to old thread
     template_name = 'conversation/reply.html'
     form_class = ReplyForm
-    success_url = reverse_lazy('list_thread')
+
+    def get_success_url(self):
+        return reverse_lazy('list_message', kwargs={'pk': self.kwargs['pk'], })
 
     # Customising context data
     def get_context_data(self, **kwargs):
@@ -113,7 +116,9 @@ class NewMessageView(FormView):
     # Requires participants for thread
     template_name = 'conversation/new_message.html'
     form_class = NewMessageForm
-    success_url = reverse_lazy('list_thread')
+
+    def get_success_url(self):
+        return reverse_lazy('list_message', kwargs={'pk': self.kwargs['pk'], })
 
     # add the request to the kwargs
     def get_form_kwargs(self):
@@ -122,6 +127,6 @@ class NewMessageView(FormView):
         return kwargs
 
     def form_valid(self, form):
-        message = form.save(commit=False)
-        message.save()
+        message = form.save()
+        self.kwargs['pk'] = message.thread_id
         return super(NewMessageView, self).form_valid(form)

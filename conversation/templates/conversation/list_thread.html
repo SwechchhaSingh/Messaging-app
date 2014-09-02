@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "conversation/base.html" %}
+
+{% block body %}
     <table>
         <tr>
-            <td>Thread id:</td>
+            <td>Thread created at:</td>
             <td>Participants:</td>
             <td>Last message of thread:</td>
             <td>Thread link</td>
         </tr>
-        {% for message in messages_list %}
+        {% for message in object_list %}
         <div><tr>
-            <td>{{ message.thread_id }}</td>
+            <td>{{ message.thread.created_at }}</td>
             <td>
             {% for participant in message.thread.participants.all %}
                 {{ participant }}
@@ -27,5 +23,4 @@
      </table>
     <a href="{% url 'new_message' %}">New Thread</a><br />
     <a href="{% url 'logout' %}">Logout</a><br />
-</body>
-</html>
+{% endblock %}

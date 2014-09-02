@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Sign Up</title>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-</head>
-<body>
+{% extends "conversation/base.html" %}
+
+{% block title %} Sign Up {% endblock %}
+
+{% block body %}
 	<form action="{% url 'signup' %}" method="post">
         {% csrf_token %}
 
@@ -16,5 +14,4 @@
 		<input type="submit" value="Sign Up" /><br />
 	</form>
     <a href="{% url 'login' %}">Login</a><br />
-</body>
-</html>
+{% endblock %}
